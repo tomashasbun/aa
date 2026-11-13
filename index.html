@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#101d34" />
+  <meta name="description" content="Plataforma de análisis cinemático de dorsiflexión y plantiflexión de tobillo con visión artificial en navegador." />
+  <title>MotionLab | Análisis de tobillo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h4l2.1-6 4.2 12 2.4-7H21"/><path d="M5 4.5c3-2 11-2 14 0" opacity=".6"/></svg></div>
+      <div><div class="brand-name">MOTIONLAB</div><div class="brand-sub">CLINICAL MOVEMENT INTELLIGENCE</div></div>
+    </div>
+    <div class="nav-label">Workspace clínico</div>
+    <nav class="nav">
+      <button class="active" data-target="analysis"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="15" rx="2"/><path d="m10 9 5 3-5 3z"/></svg><span>Análisis de tobillo</span></button>
+      <button data-target="validation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V5m0 14h16M7 15l4-4 3 2 5-7"/><path d="M16 6h3v3"/></svg><span>Validación cuantitativa</span></button>
+      <button data-target="protocol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h10l3 3v15H4V3z"/><path d="M8 10h8M8 14h8M8 18h5"/></svg><span>Protocolo de captura</span></button>
+      <button data-target="documentation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.3 2.3 0 1 1 3.9 1.6c-1.1 1-1.7 1.4-1.7 2.7M12 17h.01"/></svg><span>Documentación técnica</span></button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="privacy-card"><div class="privacy-title"><span style="color:#62d2c9">●</span> Procesamiento local</div><p>El video se analiza en este navegador. No se envía a un servidor clínico ni se almacena en la nube.</p></div>
+      <div class="profile"><div class="avatar">ML</div><div class="profile-meta"><div class="profile-name">Espacio de evaluación</div><div class="profile-role">Kinesiología · Biomecánica</div></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="crumb">Workspace <span style="color:#c1cad5"> / </span> <strong>Análisis de movimiento</strong></div>
+      <div class="top-actions"><div class="top-tag"><span class="pulse"></span> MOTOR DE VISIÓN LOCAL</div><button class="btn btn-secondary" id="exportJsonTop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m-4-4 4 4 4-4M5 17v4h14v-4"/></svg>Exportar sesión</button></div>
+    </div>
+
+    <div class="page-heading">
+      <div><div class="eyebrow">Evaluación cinemática · Miembro inferior</div><h1>Análisis de dorsiflexión y plantiflexión</h1><p class="subtitle">Captura, cuantifica y visualiza el movimiento del tobillo con asistencia de visión artificial.</p></div>
+      <div class="case-status"><span class="case-dot" id="caseDot"></span><span id="caseStatus"><b>Sin registro activo</b> · listo para comenzar</span></div>
+    </div>
+
+    <div class="overview">
+      <div class="overview-card"><div class="overview-top">REGISTROS EN ESTA SESIÓN <span class="mini-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg></span></div><div class="overview-value" id="overviewRecords">0</div><div class="overview-foot">Casos procesados en esta pestaña</div></div>
+      <div class="overview-card"><div class="overview-top">MUESTRAS VÁLIDAS <span class="mini-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m4 13 4-4 4 4 7-8"/><path d="M16 5h3v3"/></svg></span></div><div class="overview-value" id="overviewSamples">—</div><div class="overview-foot">Frames con puntos anatómicos detectados</div></div>
+      <div class="overview-card"><div class="overview-top">COBERTURA DE DETECCIÓN <span class="mini-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5v8.5l5 3"/></svg></span></div><div class="overview-value" id="overviewCoverage">—</div><div class="overview-foot">Muestras válidas / frames procesados</div></div>
+      <div class="overview-card"><div class="overview-top">MODELO DE VISIÓN <span class="mini-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 4 7v10l8 4 8-4V7z"/><path d="m4 7 8 4 8-4M12 11v10"/></svg></span></div><div class="overview-value" style="font-size:17px;margin-top:13px">Pose Landmarker</div><div class="overview-foot" id="modelState">No inicializado · carga bajo demanda</div></div>
+    </div>
+
+    <section class="content-section" id="analysis">
+      <div class="analysis-layout">
+        <div class="section-card">
+          <div class="card-head"><div><h2 class="card-title">Adquisición de movimiento</h2><div class="card-sub">Carga un video grabado o utiliza la cámara del dispositivo.</div></div><div class="mode-pill"><button id="modeVideo" class="active">Video</button><button id="modeCamera">Webcam</button></div></div>
+          <div class="card-body">
+            <div class="media-stage" id="mediaStage">
+              <video id="mediaVideo" playsinline controls class="hidden"></video>
+              <canvas id="poseCanvas" class="hidden"></canvas>
+              <div class="empty-state" id="emptyState"><div class="upload-orb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 16V4m-4 4 4-4 4 4"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg></div><h3>Comienza una evaluación</h3><p>Arrastra un video aquí o selecciona un archivo MP4, MOV o WebM. Para mejores resultados, graba el tobillo desde una vista lateral.</p><button class="btn btn-primary" id="chooseVideo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4m-4 4 4-4 4 4M4 15v4h16v-4"/></svg>Seleccionar video</button></div>
+              <div class="drop-overlay">Suelta el video para cargarlo</div>
+            </div>
+            <input type="file" id="videoFile" accept="video/mp4,video/quicktime,video/webm,video/*" class="hidden" />
+            <div class="media-meta"><span id="mediaFilename"><strong>Fuente:</strong> no seleccionada</span><span id="mediaDuration">Duración: —</span><span id="mediaFps">Muestreo: —</span></div>
+            <div class="media-controls">
+              <button class="btn btn-secondary" id="cameraStart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="m16 10 5-3v10l-5-3z"/></svg>Iniciar webcam</button>
+              <button class="btn btn-primary" id="analyzeBtn" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 6 9 6-9 6z"/></svg>Analizar video</button>
+              <button class="btn btn-ghost" id="stopBtn" disabled>Detener</button>
+              <button class="btn btn-ghost" id="resetBtn">Reiniciar</button>
+            </div>
+            <div class="progress-row"><div class="progress"><span id="progressFill"></span></div><div class="progress-label" id="progressLabel">0%</div></div>
+            <div class="setup-grid">
+              <div class="field"><label for="sideSelect">Lado analizado</label><select id="sideSelect"><option value="left">Izquierdo</option><option value="right">Derecho</option></select></div>
+              <div class="field"><label for="fpsSelect">Frecuencia de muestreo</label><select id="fpsSelect"><option value="4">4 FPS · ligero</option><option value="6" selected>6 FPS · equilibrado</option><option value="8">8 FPS · detallado</option><option value="10">10 FPS · alto</option></select></div>
+              <div class="field"><label for="visibilitySelect">Confianza mínima</label><select id="visibilitySelect"><option value="0.4">0,40 · flexible</option><option value="0.5" selected>0,50 · estándar</option><option value="0.65">0,65 · estricta</option></select></div>
+            </div>
+            <div class="media-controls" style="margin-top:10px"><button class="btn btn-secondary" id="calibrateBtn" disabled>◎ Calibrar posición neutra</button><span id="calibrationState" style="font-size:10px;color:#8492a5;align-self:center">Referencia geométrica inicial: 90°</span></div>
+            <div class="notice"><strong>Preparación:</strong> ubica cámara y pie en el mismo plano, mantén rodilla, maléolo, talón y punta visibles. La calibración neutra se recomienda antes de procesar el registro. Usa HTTPS o localhost para acceder a la webcam.</div>
+          </div>
+        </div>
+
+        <aside class="ai-panel">
+          <div class="card-head"><div><h2 class="card-title">Lectura asistida por IA</h2><div class="card-sub">Síntesis automática del registro activo.</div></div><span class="ai-chip">VISION AI</span></div>
+          <div class="ai-content">
+            <div class="ai-score-row"><div class="score-ring" id="qualityRing"><strong id="qualityScore">—</strong></div><div class="score-copy"><strong id="qualityTitle">Esperando captura</strong><span id="qualitySubtitle">La calidad de detección aparecerá al procesar un video o iniciar la cámara.</span></div></div>
+            <div class="ai-findings">
+              <div class="finding"><div class="finding-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17 9 12l3 3 8-9"/></svg></div><div><strong>Patrón angular</strong><span id="patternFinding">Aún no hay datos suficientes para describir el movimiento.</span></div></div>
+              <div class="finding"><div class="finding-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="8"/></svg></div><div><strong>Indicadores calculados</strong><span id="kpiFinding">Se mostrarán pico de dorsiflexión, plantiflexión, ROM y velocidad angular.</span></div></div>
+              <div class="finding"><div class="finding-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3 3.8 18h16.4z"/><path d="M12 9v4m0 3h.01"/></svg></div><div><strong>Calidad de captura</strong><span id="qualityFinding">Comprueba que el pie completo se mantenga dentro del encuadre.</span></div></div>
+            </div>
+            <div class="ai-disclaimer"><b>Apoyo a la decisión clínica, no diagnóstico.</b> La visión artificial estima puntos anatómicos 2D. Los resultados dependen del plano de cámara, oclusiones, calibración y calidad del video. Contrasta siempre con la evaluación física y el criterio profesional.</div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="metric-grid">
+        <div class="metric-card"><div class="metric-label">Pico dorsiflexión <span class="metric-info" title="Máximo ángulo positivo respecto a la posición neutra calibrada">ⓘ</span></div><div class="metric-value" id="metricDorsi">— <small>°</small></div><div class="metric-foot">Máximo ángulo positivo</div></div>
+        <div class="metric-card"><div class="metric-label">Pico plantiflexión <span class="metric-info" title="Magnitud del mínimo ángulo negativo respecto a la posición neutra">ⓘ</span></div><div class="metric-value" id="metricPlantar">— <small>°</small></div><div class="metric-foot">Magnitud del máximo descenso</div></div>
+        <div class="metric-card"><div class="metric-label">Rango articular (ROM) <span class="metric-info" title="Diferencia entre el máximo y el mínimo del ángulo registrado">ⓘ</span></div><div class="metric-value" id="metricRom">— <small>°</small></div><div class="metric-foot">Pico dorsiflexión − mínimo plantiflexión</div></div>
+        <div class="metric-card"><div class="metric-label">Velocidad angular pico <span class="metric-info" title="Máximo valor absoluto de la derivada angular, en grados por segundo">ⓘ</span></div><div class="metric-value" id="metricVelocity">— <small>°/s</small></div><div class="metric-foot">Máxima velocidad absoluta</div></div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="chart-card"><div class="chart-heading"><div><h3>Curva angular del tobillo</h3><p>Ángulo relativo a posición neutra · grados (°) vs tiempo (s)</p></div><span class="chart-tag">Serie temporal</span></div><div class="chart-wrap"><canvas id="angleChart" aria-label="Gráfico de ángulo de tobillo en el tiempo"></canvas></div></div>
+        <div class="chart-card"><div class="chart-heading"><div><h3>Amplitud del movimiento</h3><p>Picos estimados por dirección y rango total</p></div><span class="chart-tag">Resumen</span></div><div class="chart-wrap"><canvas id="rangeChart" aria-label="Gráfico de amplitud de movimiento"></canvas></div></div>
+        <div class="chart-card"><div class="chart-heading"><div><h3>Velocidad angular</h3><p>Derivada temporal del ángulo · grados por segundo (°/s)</p></div><span class="chart-tag">Dinámica</span></div><div class="chart-wrap small"><canvas id="velocityChart" aria-label="Gráfico de velocidad angular"></canvas></div></div>
+        <div class="chart-card"><div class="chart-heading"><div><h3>Confianza de landmarks</h3><p>Visibilidad promedio de los puntos anatómicos (%)</p></div><span class="chart-tag">Calidad de señal</span></div><div class="chart-wrap small"><canvas id="confidenceChart" aria-label="Gráfico de confianza del modelo"></canvas></div></div>
+      </div>
+    </section>
+
+    <section class="content-section" id="validation">
+      <div class="section-card">
+        <div class="card-head validation-head"><div><h2 class="card-title">Validación cuantitativa contra referencia independiente</h2><div class="card-sub">Contrasta tres KPIs en dos registros; documenta el error absoluto y la tolerancia adoptada.</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><select id="validationRecord" style="border:1px solid #dfe6ef;border-radius:8px;padding:8px 9px;font-size:10px;color:#40536d"><option value="1">Registro 1</option><option value="2">Registro 2</option></select><button class="btn btn-primary" id="linkValidation">Vincular resultados actuales</button><button class="btn btn-secondary" id="exportValidation">Exportar validación CSV</button></div></div>
+        <div class="validation-info"><strong>Importante:</strong> la referencia debe provenir de un método independiente (por ejemplo, goniómetro, sistema de captura validado o evaluador entrenado). No uses el resultado de la propia aplicación como referencia. La tolerancia inicial de 5° es solo un valor configurable de trabajo, no un umbral normativo ni una validación clínica.</div>
+        <div class="validation-table-wrap"><table><thead><tr><th>Registro</th><th>Indicador</th><th>Resultado MotionLab</th><th>Referencia externa</th><th>Error absoluto</th><th>Tolerancia (°)</th><th>Estado</th></tr></thead><tbody id="validationBody"></tbody></table></div>
+      </div>
+    </section>
+
+    <section class="content-section" id="protocol">
+      <div class="section-card">
+        <div class="card-head"><div><h2 class="card-title">Protocolo de captura recomendado</h2><div class="card-sub">Condiciones para reducir errores de perspectiva y mejorar la reproducibilidad.</div></div><span class="chart-tag">Guía operativa</span></div>
+        <div class="protocol-grid">
+          <div class="protocol-card"><div class="protocol-num">01 / POSICIÓN</div><h3>Vista sagital estricta</h3><p>Ubica el dispositivo a la altura aproximada del tobillo y perpendicular al plano de movimiento. Evita tomas frontales o en perspectiva oblicua.</p></div>
+          <div class="protocol-card"><div class="protocol-num">02 / ENCUADRE</div><h3>Landmarks visibles</h3><p>Mantén en cuadro rodilla, tobillo, talón y punta del pie durante toda la ejecución. Evita ropa u objetos que oculten los puntos.</p></div>
+          <div class="protocol-card"><div class="protocol-num">03 / CALIBRACIÓN</div><h3>Posición neutra</h3><p>Coloca el pie en posición neutra y pulsa “Calibrar posición neutra”. La curva se expresará como desviación respecto a esa referencia.</p></div>
+          <div class="protocol-card"><div class="protocol-num">04 / MOVIMIENTO</div><h3>Repeticiones controladas</h3><p>Solicita ciclos completos de dorsiflexión y plantiflexión, sin mover la cámara. Registra el lado, protocolo y condiciones de ejecución.</p></div>
+          <div class="protocol-card"><div class="protocol-num">05 / PROCESAMIENTO</div><h3>Frecuencia y confianza</h3><p>El procesamiento de video muestrea entre 4 y 10 fotogramas por segundo. Aumentar FPS puede mejorar el detalle y también el tiempo de ejecución.</p></div>
+          <div class="protocol-card"><div class="protocol-num">06 / INTERPRETACIÓN</div><h3>Lectura contextualizada</h3><p>Compara con la extremidad contralateral, medición instrumental y antecedentes del paciente. No interpretes una cifra aislada como diagnóstico.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section" id="documentation">
+      <div class="section-card">
+        <div class="card-head"><div><h2 class="card-title">Método, trazabilidad y documentación</h2><div class="card-sub">Información técnica para reproducir la medición y auditar las transformaciones.</div></div><span class="chart-tag">Método v1.0.3</span></div>
+        <div class="docs-body">
+          <div><h3>Definición de indicadores</h3><ul>
+            <li><b>Pico de dorsiflexión (°):</b> máximo del ángulo relativo observado.</li>
+            <li><b>Pico de plantiflexión (°):</b> valor absoluto del mínimo ángulo relativo observado.</li>
+            <li><b>ROM (°):</b> máximo angular menos mínimo angular del registro.</li>
+            <li><b>Velocidad angular pico (°/s):</b> máximo valor absoluto de Δángulo / Δtiempo.</li>
+            <li><b>Cobertura (%):</b> fotogramas con landmarks válidos / fotogramas procesados × 100.</li>
+            <li><b>Confianza (%):</b> visibilidad media de rodilla, tobillo y punta del pie, que son los tres puntos usados en el cálculo.</li>
+          </ul><h3 style="margin-top:18px">Procesamiento geométrico</h3><p>La IA detecta landmarks 2D. Antes del cálculo, las coordenadas normalizadas se convierten a píxeles con el ancho y alto reales del video para respetar su relación de aspecto. Se calcula el ángulo entre el vector tobillo→rodilla y el vector tobillo→punta del pie mediante producto punto y coseno inverso. El ángulo relativo se obtiene como ángulo neutro calibrado menos ángulo geométrico observado. La velocidad se estima por diferencias finitas entre muestras consecutivas.</p><p>Las coordenadas 2D dependen de perspectiva y no representan una medición goniométrica certificada. El plano sagital y la calibración son esenciales.</p></div>
+          <div><h3>Fuentes, unidades y reproducción</h3><div class="code-box">Entrada: video local / cámara web
+Modelo: MediaPipe Pose Landmarker
+Landmarks: rodilla, tobillo, talón, índice del pie
+Unidades: grados (°), segundos (s), °/s, %
+Frecuencia: 4–10 FPS en video; webcam adaptativa
+Confianza mínima: configurable (0,40–0,65)
+Calibración neutra: manual o geométrica inicial 90°
+Exportación: CSV de muestras + JSON de sesión
+Procesamiento: navegador del usuario</div><p style="margin-top:10px">Motor de gráficos: Canvas integrado; MediaPipe Tasks Vision se descarga al iniciar análisis. Se usa Pose Landmarker Lite con aceleración GPU y alternativa CPU. El modelo se descarga una vez durante la instalación inicial. Los archivos de video y la captura de cámara se procesan localmente y no se transmiten a un servidor.</p><p><b>Limitaciones conocidas:</b> detección 2D, oclusiones, reflejos, calzado, ropa holgada, mala iluminación, perspectiva y movimiento fuera de plano. La estimación puede fallar si el sujeto no está visible de cuerpo suficiente.</p><h3 style="margin-top:15px">Datos y privacidad</h3><p>El archivo de video permanece en memoria local del navegador. No se incorpora almacenamiento en nube. Al cerrar o recargar la pestaña, las muestras de la sesión se pierden salvo que se exporten.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <div style="display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:22px 0 0"><button class="btn btn-secondary" id="exportCsv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v12m-4-4 4 4 4-4M5 17v4h14v-4"/></svg>Exportar muestras CSV</button><button class="btn btn-secondary" id="printPdfBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M7 14h10v7H7z"/></svg>Informe PDF / imprimir</button></div>
+    <div class="footer-note">MOTIONLAB · Herramienta de apoyo para análisis de movimiento · No sustituye evaluación clínica ni instrumentos validados.</div>
+  </main>
+</div>
+<div id="printReport"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="./index.js?v=1.0.4"></script>
+</body>
+</html>
